@@ -6,12 +6,54 @@ import axios from "axios";
 import zxcvbn from "zxcvbn";
 import sha1 from "js-sha1";
 
-const MySwal = withReactContent(Swal);
+// Material UI Components
+import {
+  Box,
+  Container,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  InputAdornment,
+  IconButton,
+  LinearProgress,
+  Alert,
+  Stepper,
+  Step,
+  StepLabel,
+  Card,
+  CardContent,
+  useTheme,
+  alpha,
+} from "@mui/material";
+import {
+  Visibility,
+  VisibilityOff,
+  Person,
+  Email,
+  Phone,
+  Lock,
+  Security,
+  AssignmentInd,
+  QuestionAnswer,
+} from "@mui/icons-material";
+import { motion } from "framer-motion";
 
+const MySwal = withReactContent(Swal);
 const API_BASE_URL = "https://backenddulceria.onrender.com";
+
+// Motion Components
+const MotionPaper = motion(Paper);
+const MotionCard = motion(Card);
 
 function RegistroUsuarios() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const [activeStep, setActiveStep] = useState(0);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [formErrors, setFormErrors] = useState({});
   const [passwordError, setPasswordError] = useState("");
@@ -25,10 +67,20 @@ function RegistroUsuarios() {
     telefono: "",
     correo: "",
     password: "",
-    tipousuario: "Cliente", // Valor por defecto
+    tipousuario: "Cliente",
     preguntaSecreta: "",
     respuestaSecreta: "",
   });
+
+  const steps = ['Información Personal', 'Credenciales', 'Seguridad'];
+
+  const handleNext = () => {
+    setActiveStep((prevStep) => prevStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevStep) => prevStep - 1);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,7 +139,6 @@ function RegistroUsuarios() {
     }
 
     if (name === "tipousuario") {
-      // CORREGIDO: Validación para los tipos correctos
       if (!["Cliente", "Administrador", "Repartidor"].includes(value)) {
         errors[name] = "Selecciona un tipo de usuario válido.";
       } else {
@@ -192,7 +243,7 @@ function RegistroUsuarios() {
       correo: formData.correo,
       telefono: formData.telefono,
       password: formData.password,
-      tipousuario: formData.tipousuario, // Ahora se envía correctamente
+      tipousuario: formData.tipousuario,
       preguntaSecreta: formData.preguntaSecreta,
       respuestaSecreta: formData.respuestaSecreta,
     };
@@ -201,7 +252,6 @@ function RegistroUsuarios() {
       const response = await axios.post(`${API_BASE_URL}/api/registro`, dataToSend);
       console.log("Respuesta del backend:", response.data);
       
-      // CORREGIDO: Mejor manejo de la redirección
       await MySwal.fire({
         title: "¡Registro exitoso!",
         html: `
@@ -210,11 +260,8 @@ function RegistroUsuarios() {
         `,
         icon: "success",
         confirmButtonText: "Ir a verificar correo",
-        background: '#f0fdf4',
-        iconColor: '#22c55e'
       });
       
-      // Redirigir después de cerrar el modal
       navigate("/verificar-correo");
       
     } catch (error) {
@@ -224,16 +271,12 @@ function RegistroUsuarios() {
           icon: "error",
           title: "Error en el registro",
           text: error.response.data.error,
-          background: '#fef2f2',
-          iconColor: '#ef4444'
         });
       } else {
         MySwal.fire({
           icon: "error",
           title: "Error de conexión",
           text: "No te pudiste registrar. Por favor, intenta de nuevo.",
-          background: '#fef2f2',
-          iconColor: '#ef4444'
         });
       }
     } finally {
@@ -261,176 +304,408 @@ function RegistroUsuarios() {
   const getStrengthColor = (strength) => {
     switch (strength) {
       case 0:
-        return "#ef4444";
+        return theme.palette.error.main;
       case 1:
-        return "#f97316";
+        return theme.palette.warning.main;
       case 2:
         return "#eab308";
       case 3:
-        return "#3b82f6";
+        return theme.palette.info.main;
       case 4:
-        return "#22c55e";
+        return theme.palette.success.main;
       default:
-        return "#d1d5db";
+        return theme.palette.grey[300];
+    }
+  };
+
+  const renderStepContent = (step) => {
+    switch (step) {
+      case 0:
+        return (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <TextField
+              fullWidth
+              label="Nombre"
+              name="nombre"
+              value={formData.nombre}
+              onChange={handleChange}
+              error={!!formErrors.nombre}
+              helperText={formErrors.nombre}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Person color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                }
+              }}
+            />
+
+            <TextField
+              fullWidth
+              label="Apellido Paterno"
+              name="apellidopa"
+              value={formData.apellidopa}
+              onChange={handleChange}
+              error={!!formErrors.apellidopa}
+              helperText={formErrors.apellidopa}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Person color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                }
+              }}
+            />
+
+            <TextField
+              fullWidth
+              label="Apellido Materno"
+              name="apellidoma"
+              value={formData.apellidoma}
+              onChange={handleChange}
+              error={!!formErrors.apellidoma}
+              helperText={formErrors.apellidoma}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Person color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                }
+              }}
+            />
+
+            <TextField
+              fullWidth
+              label="Teléfono"
+              name="telefono"
+              value={formData.telefono}
+              onChange={handleChange}
+              error={!!formErrors.telefono}
+              helperText={formErrors.telefono}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Phone color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                }
+              }}
+            />
+          </Box>
+        );
+
+      case 1:
+        return (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <TextField
+              fullWidth
+              label="Correo Electrónico"
+              name="correo"
+              type="email"
+              value={formData.correo}
+              onChange={handleChange}
+              error={!!formErrors.correo}
+              helperText={formErrors.correo}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                }
+              }}
+            />
+
+            <TextField
+              fullWidth
+              label="Contraseña"
+              name="password"
+              type={passwordVisible ? "text" : "password"}
+              value={formData.password}
+              onChange={handleChange}
+              error={!!formErrors.password || !!passwordError}
+              helperText={formErrors.password || passwordError}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={handlePasswordVisibility} edge="end">
+                      {passwordVisible ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                }
+              }}
+            />
+
+            {formData.password && (
+              <Box sx={{ mt: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Fortaleza de la contraseña:
+                  </Typography>
+                  <Typography 
+                    variant="body2" 
+                    fontWeight="bold"
+                    sx={{ color: getStrengthColor(passwordStrength) }}
+                  >
+                    {getPasswordStrengthText(passwordStrength)}
+                  </Typography>
+                </Box>
+                <LinearProgress 
+                  variant="determinate" 
+                  value={(passwordStrength + 1) * 20} 
+                  sx={{
+                    height: 8,
+                    borderRadius: 4,
+                    bgcolor: theme.palette.grey[200],
+                    '& .MuiLinearProgress-bar': {
+                      bgcolor: getStrengthColor(passwordStrength),
+                      borderRadius: 4,
+                    }
+                  }}
+                />
+              </Box>
+            )}
+
+            <FormControl fullWidth error={!!formErrors.tipousuario}>
+              <InputLabel>Tipo de Usuario</InputLabel>
+              <Select
+                name="tipousuario"
+                value={formData.tipousuario}
+                onChange={handleChange}
+                label="Tipo de Usuario"
+                startAdornment={
+                  <InputAdornment position="start">
+                    <AssignmentInd color="action" />
+                  </InputAdornment>
+                }
+                sx={{
+                  borderRadius: 2,
+                }}
+              >
+                <MenuItem value="Cliente">Cliente</MenuItem>
+                <MenuItem value="Repartidor">Repartidor</MenuItem>
+              </Select>
+              {formErrors.tipousuario && (
+                <Typography variant="caption" color="error">
+                  {formErrors.tipousuario}
+                </Typography>
+              )}
+            </FormControl>
+          </Box>
+        );
+
+      case 2:
+        return (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <FormControl fullWidth error={!!formErrors.preguntaSecreta}>
+              <InputLabel>Pregunta de Seguridad</InputLabel>
+              <Select
+                name="preguntaSecreta"
+                value={formData.preguntaSecreta}
+                onChange={handleChange}
+                label="Pregunta de Seguridad"
+                startAdornment={
+                  <InputAdornment position="start">
+                    <Security color="action" />
+                  </InputAdornment>
+                }
+                sx={{
+                  borderRadius: 2,
+                }}
+              >
+                <MenuItem value="">Selecciona una pregunta</MenuItem>
+                <MenuItem value="¿Cuál es el nombre de tu primera mascota?">
+                  ¿Cuál es el nombre de tu primera mascota?
+                </MenuItem>
+                <MenuItem value="¿En qué ciudad naciste?">
+                  ¿En qué ciudad naciste?
+                </MenuItem>
+                <MenuItem value="¿Cuál es tu comida favorita?">
+                  ¿Cuál es tu comida favorita?
+                </MenuItem>
+              </Select>
+              {formErrors.preguntaSecreta && (
+                <Typography variant="caption" color="error">
+                  {formErrors.preguntaSecreta}
+                </Typography>
+              )}
+            </FormControl>
+
+            <TextField
+              fullWidth
+              label="Respuesta de Seguridad"
+              name="respuestaSecreta"
+              value={formData.respuestaSecreta}
+              onChange={handleChange}
+              error={!!formErrors.respuestaSecreta}
+              helperText={formErrors.respuestaSecreta}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <QuestionAnswer color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                }
+              }}
+            />
+
+            <Alert severity="info" sx={{ borderRadius: 2 }}>
+              Esta información te ayudará a recuperar tu cuenta en caso de olvidar tus credenciales.
+            </Alert>
+          </Box>
+        );
+
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="registro-container">
-      <form onSubmit={handleSubmit} className="registro-form">
-        <h2>Registro de Usuario</h2>
-        
-        <div className="form-group">
-          <label>Nombre:</label>
-          <input
-            type="text"
-            name="nombre"
-            value={formData.nombre}
-            onChange={handleChange}
-            required
-          />
-          {formErrors.nombre && <span className="error">{formErrors.nombre}</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Apellido Paterno:</label>
-          <input
-            type="text"
-            name="apellidopa"
-            value={formData.apellidopa}
-            onChange={handleChange}
-            required
-          />
-          {formErrors.apellidopa && <span className="error">{formErrors.apellidopa}</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Apellido Materno:</label>
-          <input
-            type="text"
-            name="apellidoma"
-            value={formData.apellidoma}
-            onChange={handleChange}
-            required
-          />
-          {formErrors.apellidoma && <span className="error">{formErrors.apellidoma}</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Teléfono:</label>
-          <input
-            type="tel"
-            name="telefono"
-            value={formData.telefono}
-            onChange={handleChange}
-            required
-          />
-          {formErrors.telefono && <span className="error">{formErrors.telefono}</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Correo:</label>
-          <input
-            type="email"
-            name="correo"
-            value={formData.correo}
-            onChange={handleChange}
-            required
-          />
-          {formErrors.correo && <span className="error">{formErrors.correo}</span>}
-        </div>
-
-        <div className="form-group">
-          <label>Contraseña:</label>
-          <div className="password-input-wrapper">
-            <input
-              type={passwordVisible ? "text" : "password"}
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-            <button 
-              type="button" 
-              onClick={handlePasswordVisibility}
-              className="toggle-password"
-            >
-              {passwordVisible ? "👁️" : "👁️‍🗨️"}
-            </button>
-          </div>
-          {formErrors.password && <span className="error">{formErrors.password}</span>}
-          
-          {formData.password && (
-            <div className="password-strength">
-              <div 
-                className="strength-bar"
-                style={{
-                  width: `${(passwordStrength + 1) * 20}%`,
-                  backgroundColor: getStrengthColor(passwordStrength)
-                }}
-              />
-              <span style={{ color: getStrengthColor(passwordStrength) }}>
-                {getPasswordStrengthText(passwordStrength)}
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* AGREGADO: Campo para seleccionar tipo de usuario */}
-        <div className="form-group">
-          <label>Tipo de Usuario:</label>
-          <select
-            name="tipousuario"
-            value={formData.tipousuario}
-            onChange={handleChange}
-            required
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.1)} 0%, ${alpha(theme.palette.secondary.light, 0.1)} 100%)`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        py: 4,
+        px: 2
+      }}
+    >
+      <Container component="main" maxWidth="md">
+        <MotionPaper
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          elevation={8}
+          sx={{
+            borderRadius: 4,
+            overflow: 'hidden',
+            background: 'white',
+          }}
+        >
+          {/* Header */}
+          <Box
+            sx={{
+              background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+              py: 4,
+              textAlign: 'center',
+              color: 'white',
+            }}
           >
-            <option value="Cliente">Cliente</option>
-            <option value="Administrador">Administrador</option>
-            <option value="Repartidor">Repartidor</option>
-          </select>
-          {formErrors.tipousuario && <span className="error">{formErrors.tipousuario}</span>}
-        </div>
+            <Typography variant="h3" component="h1" fontWeight="bold" gutterBottom>
+              Crear Cuenta
+            </Typography>
+            <Typography variant="h6" sx={{ opacity: 0.9 }}>
+              Únete a nuestra dulce comunidad
+            </Typography>
+          </Box>
 
-        <div className="form-group">
-          <label>Pregunta de Seguridad:</label>
-          <select
-            name="preguntaSecreta"
-            value={formData.preguntaSecreta}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Selecciona una pregunta</option>
-            <option value="¿Cuál es el nombre de tu primera mascota?">
-              ¿Cuál es el nombre de tu primera mascota?
-            </option>
-            <option value="¿En qué ciudad naciste?">
-              ¿En qué ciudad naciste?
-            </option>
-            <option value="¿Cuál es tu comida favorita?">
-              ¿Cuál es tu comida favorita?
-            </option>
-          </select>
-          {formErrors.preguntaSecreta && <span className="error">{formErrors.preguntaSecreta}</span>}
-        </div>
+          {/* Content */}
+          <Box sx={{ p: 6 }}>
+            <Stepper activeStep={activeStep} sx={{ mb: 6 }}>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
 
-        <div className="form-group">
-          <label>Respuesta de Seguridad:</label>
-          <input
-            type="text"
-            name="respuestaSecreta"
-            value={formData.respuestaSecreta}
-            onChange={handleChange}
-            required
-          />
-          {formErrors.respuestaSecreta && <span className="error">{formErrors.respuestaSecreta}</span>}
-        </div>
+            <form onSubmit={handleSubmit}>
+              {renderStepContent(activeStep)}
 
-        <button type="submit" disabled={isLoading} className="submit-btn">
-          {isLoading ? "Registrando..." : "Registrarse"}
-        </button>
-      </form>
-    </div>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 6 }}>
+                <Button
+                  disabled={activeStep === 0}
+                  onClick={handleBack}
+                  variant="outlined"
+                  sx={{
+                    borderRadius: 2,
+                    px: 4,
+                    py: 1.5,
+                    fontWeight: 'bold'
+                  }}
+                >
+                  Anterior
+                </Button>
+
+                {activeStep === steps.length - 1 ? (
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={isLoading || Object.keys(formErrors).length > 0}
+                    sx={{
+                      borderRadius: 2,
+                      px: 4,
+                      py: 1.5,
+                      fontWeight: 'bold',
+                      background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                      '&:hover': {
+                        transform: 'translateY(-2px)',
+                        boxShadow: 4
+                      },
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    {isLoading ? "Registrando..." : "Completar Registro"}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    onClick={handleNext}
+                    sx={{
+                      borderRadius: 2,
+                      px: 4,
+                      py: 1.5,
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Siguiente
+                  </Button>
+                )}
+              </Box>
+            </form>
+          </Box>
+        </MotionPaper>
+      </Container>
+    </Box>
   );
 }
 
