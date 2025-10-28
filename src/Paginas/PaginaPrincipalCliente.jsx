@@ -719,4 +719,4 @@ const PaginaPrincipalCliente = () => {
   )
 }
 
-export default PaginaPrincipalCliente
+export default PaginaPrincipalCliente;

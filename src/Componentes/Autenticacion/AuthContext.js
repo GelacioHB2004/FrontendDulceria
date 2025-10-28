@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
 
       if (storedUser && storedToken) {
         try {
-          const response = await axios.get('http://localhost:3000/api/login/perfilF', {
+          const response = await axios.get('https://backenddulceria.onrender.com/api/login/perfilF', {
             headers: { Authorization: `Bearer ${storedToken}` }
           });
           setUser(response.data);
