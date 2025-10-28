@@ -16,13 +16,66 @@ const LayoutConEncabezado = ({ children }) => {
   const { user, loading } = useAuth();
   const { theme } = useTheme();
 
-  if (loading) {
-    return <div>Cargando...</div>; // O un spinner
+  // CORREGIDO: Agregamos timeout y mejor manejo del loading
+  const [showContent, setShowContent] = React.useState(false);
+
+  React.useEffect(() => {
+    // Si después de 2 segundos sigue cargando, mostrar contenido de todas formas
+    const timer = setTimeout(() => {
+      setShowContent(true);
+    }, 2000);
+
+    if (!loading) {
+      setShowContent(true);
+      clearTimeout(timer);
+    }
+
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  // CORREGIDO: Mejor UI de carga
+  if (loading && !showContent) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '18px',
+        fontFamily: 'Arial, sans-serif'
+      }}>
+        <div>
+          <div style={{ marginBottom: '10px' }}>🍬 Cargando Dulcería...</div>
+          <div style={{ 
+            width: '200px', 
+            height: '4px', 
+            background: '#eee', 
+            borderRadius: '2px',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              width: '50%',
+              height: '100%',
+              background: '#4CAF50',
+              animation: 'loading 1s ease-in-out infinite'
+            }}></div>
+          </div>
+        </div>
+        <style>{`
+          @keyframes loading {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(200%); }
+            100% { transform: translateX(-100%); }
+          }
+        `}</style>
+      </div>
+    );
   }
 
   let encabezado;
   let pieDePagina;
 
+  // Rutas protegidas
   if (location.pathname.startsWith('/admin')) {
     if (!user || user.TipoUsuario !== 'Administrador') return <Navigate to="/" replace />;
     encabezado = <EncabezadoAdministrativo />;
@@ -36,6 +89,7 @@ const LayoutConEncabezado = ({ children }) => {
     encabezado = <EncabezadoRepartidor />;
     pieDePagina = <PieDePaginaRepartidor />;
   } else {
+    // Rutas públicas: /, /login, /registro, /verificar-correo
     encabezado = <EncabezadoPublico />;
     pieDePagina = <PieDePagina />;
   }
@@ -68,6 +122,7 @@ const LayoutConEncabezado = ({ children }) => {
           flex-grow: 1;
           background-color: ${theme === 'dark' ? '#1d1d1d' : '#ffffff'};
           color: ${theme === 'dark' ? '#ffffff' : '#000000'};
+          padding: 20px;
         }
 
         header, footer {

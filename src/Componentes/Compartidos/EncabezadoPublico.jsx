@@ -35,7 +35,10 @@ const EncabezadoPublico = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  // CORREGIDO: Simplificado y mejorado
   const handleMenuClick = (key) => {
+    handleClick(key);
+    
     switch (key) {
       case "home":
         navigate('/');
@@ -45,6 +48,9 @@ const EncabezadoPublico = () => {
         break;
       case "login":
         navigate('/login');
+        break;
+      case "registro":
+        navigate('/registro');
         break;
       default:
         console.log("No se reconoce la acción del menú");
@@ -89,6 +95,7 @@ const EncabezadoPublico = () => {
           display: flex;
           align-items: center;
           flex: 1;
+          cursor: pointer;
         }
 
         .logo img {
@@ -102,6 +109,7 @@ const EncabezadoPublico = () => {
           font-size: 1.2rem;
           font-weight: bold;
           color: var(--color-secondary);
+          margin: 0;
         }
 
         .menu ul {
@@ -122,6 +130,7 @@ const EncabezadoPublico = () => {
           gap: 8px;
           color: var(--color-secondary);
           transition: background-color 0.3s, color 0.3s;
+          user-select: none;
         }
 
         .menu ul li:hover {
@@ -139,12 +148,14 @@ const EncabezadoPublico = () => {
           flex-direction: column;
           cursor: pointer;
           gap: 4px;
+          z-index: 2001;
         }
 
         .hamburger {
           width: 25px;
           height: 3px;
           background-color: var(--color-secondary);
+          transition: all 0.3s;
         }
 
         .menu-overlay {
@@ -202,7 +213,7 @@ const EncabezadoPublico = () => {
         <div className="menu-overlay" onClick={toggleMobileMenu}></div>
       )}
       <header className="header">
-        <div className="logo">
+        <div className="logo" onClick={() => handleMenuClick('home')}>
           {logoUrl && (
             <img src={logoUrl} alt="Logo Empresa" />
           )}
@@ -210,15 +221,24 @@ const EncabezadoPublico = () => {
         </div>
         <nav className={`menu ${isMobileMenuOpen ? 'menu-open' : ''}`} ref={menuRef}>
           <ul>
-            <li className={active === 'home' ? 'active' : ''} onClick={() => { handleClick('home'); handleMenuClick('home'); }}>
+            <li 
+              className={active === 'home' ? 'active' : ''} 
+              onClick={() => handleMenuClick('home')}
+            >
               <HomeOutlined style={{ color: '#2ECC71' }} />
               Inicio
             </li>
-            {/* <li className={active === 'hoteles' ? 'active' : ''} onClick={() => { handleClick('hoteles'); handleMenuClick('hoteles'); }}>
+            {/* <li 
+              className={active === 'hoteles' ? 'active' : ''} 
+              onClick={() => handleMenuClick('hoteles')}
+            >
               <BankOutlined style={{ color: '#E67E22' }} />
               Hoteles
             </li> */}
-            <li className={active === 'login' ? 'active' : ''} onClick={() => { handleClick('login'); handleMenuClick('login'); }}>
+            <li 
+              className={active === 'login' ? 'active' : ''} 
+              onClick={() => handleMenuClick('login')}
+            >
               <LoginOutlined style={{ color: '#E74C3C' }} />
               Iniciar sesión
             </li>
