@@ -516,7 +516,6 @@ function RegistroUsuarios() {
                 }}
               >
                 <MenuItem value="Cliente">Cliente</MenuItem>
-                <MenuItem value="Repartidor">Repartidor</MenuItem>
               </Select>
               {formErrors.tipousuario && (
                 <Typography variant="caption" color="error">
