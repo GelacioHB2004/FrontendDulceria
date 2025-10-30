@@ -71,15 +71,26 @@ function RegistroUsuarios() {
 
   const steps = ['Información Personal', 'Credenciales', 'Seguridad'];
 
-  const handleNext = () => {
+  const handleNext = (e) => {
+    e.preventDefault(); // IMPORTANTE: Prevenir el submit del formulario
+    e.stopPropagation(); // Detener la propagación del evento
+    
     // Validar los campos del paso actual antes de avanzar
     const isStepValid = validateCurrentStep();
     if (isStepValid) {
       setActiveStep((prevStep) => prevStep + 1);
+    } else {
+      MySwal.fire({
+        icon: "warning",
+        title: "Campos incompletos",
+        text: "Por favor completa todos los campos correctamente antes de continuar.",
+      });
     }
   };
 
-  const handleBack = () => {
+  const handleBack = (e) => {
+    e.preventDefault(); // IMPORTANTE: Prevenir el submit del formulario
+    e.stopPropagation(); // Detener la propagación del evento
     setActiveStep((prevStep) => prevStep - 1);
   };
 
@@ -243,6 +254,13 @@ function RegistroUsuarios() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validar que estamos en el paso 3 (índice 2)
+    if (activeStep !== 2) {
+      console.log("No se puede enviar el formulario. Paso actual:", activeStep);
+      return;
+    }
+
     setIsLoading(true);
     console.log("Datos enviados al backend:", formData);
 
@@ -688,7 +706,6 @@ function RegistroUsuarios() {
                   disabled={activeStep === 0}
                   onClick={handleBack}
                   variant="outlined"
-                  type="button"
                   sx={{
                     borderRadius: 2,
                     px: 4,
@@ -723,7 +740,6 @@ function RegistroUsuarios() {
                   <Button
                     variant="contained"
                     onClick={handleNext}
-                    type="button"
                     sx={{
                       borderRadius: 2,
                       px: 4,
