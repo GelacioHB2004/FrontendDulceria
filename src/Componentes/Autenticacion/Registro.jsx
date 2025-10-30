@@ -25,8 +25,6 @@ import {
   Stepper,
   Step,
   StepLabel,
-  Card,
-  CardContent,
   useTheme,
   alpha,
 } from "@mui/material";
@@ -48,7 +46,6 @@ const API_BASE_URL = "https://backenddulceria.onrender.com";
 
 // Motion Components
 const MotionPaper = motion(Paper);
-const MotionCard = motion(Card);
 
 function RegistroUsuarios() {
   const navigate = useNavigate();
@@ -75,11 +72,47 @@ function RegistroUsuarios() {
   const steps = ['Información Personal', 'Credenciales', 'Seguridad'];
 
   const handleNext = () => {
-    setActiveStep((prevStep) => prevStep + 1);
+    // Validar los campos del paso actual antes de avanzar
+    const isStepValid = validateCurrentStep();
+    if (isStepValid) {
+      setActiveStep((prevStep) => prevStep + 1);
+    }
   };
 
   const handleBack = () => {
     setActiveStep((prevStep) => prevStep - 1);
+  };
+
+  const validateCurrentStep = () => {
+    switch (activeStep) {
+      case 0: // Información Personal
+        return !formErrors.nombre && 
+               !formErrors.apellidopa && 
+               !formErrors.apellidoma && 
+               !formErrors.telefono &&
+               formData.nombre && 
+               formData.apellidopa && 
+               formData.apellidoma && 
+               formData.telefono;
+      
+      case 1: // Credenciales
+        return !formErrors.correo && 
+               !formErrors.password && 
+               !formErrors.tipousuario &&
+               !passwordError &&
+               formData.correo && 
+               formData.password && 
+               formData.tipousuario;
+      
+      case 2: // Seguridad
+        return !formErrors.preguntaSecreta && 
+               !formErrors.respuestaSecreta &&
+               formData.preguntaSecreta && 
+               formData.respuestaSecreta;
+      
+      default:
+        return false;
+    }
   };
 
   const handleChange = (e) => {
@@ -655,6 +688,7 @@ function RegistroUsuarios() {
                   disabled={activeStep === 0}
                   onClick={handleBack}
                   variant="outlined"
+                  type="button"
                   sx={{
                     borderRadius: 2,
                     px: 4,
@@ -689,6 +723,7 @@ function RegistroUsuarios() {
                   <Button
                     variant="contained"
                     onClick={handleNext}
+                    type="button"
                     sx={{
                       borderRadius: 2,
                       px: 4,
